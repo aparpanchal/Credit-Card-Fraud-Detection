@@ -1,1 +1,51 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
+#Loading the data and having a look at it's structure
+credit_card_data = pd.read_csv('/creditcard_2023.csv')
+credit_card_data = credit_card_data
+credit_card_data.head()
+
+#Checking data validity
+credit_card_data.isnull().sum()
+
+#Checking distribution of dependent variable
+credit_card_data['Class'].value_counts()
+
+#Dividing data into legit and fraud transactions
+legit = credit_card_data[credit_card_data.Class == 0]
+fraud = credit_card_data[credit_card_data.Class == 1]
+
+#Examing distribution of amount in both data
+legit.Amount.describe()
+fraud.Amount.describe()
+
+#comparing the values for both kinds of transactions
+credit_card_data.groupby('Class').mean()
+
+#dropping unnecessary variables and forming features
+X = credit_card_data.drop(columns='id', axis=1)
+X = X.drop(('Class') , axis = 1)
+Y = credit_card_data['Class']
+
+#Data Split
+X_Train , X_Test, Y_Train, Y_Test = train_test_split(X,Y, test_size=0.25,stratify=Y,random_state=2)
+
+#model and training the model 
+model = LogisticRegression(max_iter=1000)
+model.fit(X_Train , Y_Train)
+
+X_Train_prediction = model.predict(X_Train)
+Train_Data_Accuracy = accuracy_score(X_Train_prediction , Y_Train)
+
+print("Accuracy Score on Training Sample is :" , round(Train_Data_Accuracy*100,2), "%")
+
+#Using the model on test data for checking it's validity 
+X_Test_prediction = model.predict(X_Test)
+Test_Data_Accuracy = accuracy_score(X_Test_prediction , Y_Test)
+print("Accuracy Score on Training Sample is :" , round(Test_Data_Accuracy*100,2), "%")
+
 
